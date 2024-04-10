@@ -1,0 +1,28 @@
+{
+  "name": "movie-api",
+  "version": "1.0.0",
+  "description": "worst movies",
+  "main": "main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rimraf dist && tsc"
+  },
+  "keywords": [
+    "movies"
+  ],
+  "author": "Ricardo Zanivan",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "csv": "^6.3.8",
+    "csvtojson": "^2.0.10",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "npm": "^10.5.1",
+    "rimraf": "3.0.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "typescript": "5.4.4"
+  }
+}
