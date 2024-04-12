@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { app } from '@/main/config/app';
-const connectToDatabase = require("../../../src/main/config/db.ts")
+const connectToDatabase = require("../../../src/infra/repos/sqlite3/db")
 
 let db;
 

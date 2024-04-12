@@ -1,10 +1,9 @@
 const fs = require("fs");
 const sqlite3 = require("sqlite3").verbose();
-const filepath = "../../../population.db";
+const filepath = "../../../../population.db";
 
 function connectToDatabase() {
-    console.log('=== connectToDatabase entrou ===')
-    // fs.unlinkSync(filepath);
+    fs.unlinkSync(filepath);
     if (fs.existsSync(filepath)) {
         return new sqlite3.Database(filepath);
     } else {

@@ -1,4 +1,4 @@
-const db = require("./db");
+const db = require("../../infra/repos/sqlite3/db");
 
 function loadAwards() {
     db.each("SELECT * FROM migration", function(err, row) {
