@@ -3,7 +3,7 @@ const sqlite3 = require("sqlite3").verbose();
 const filepath = "../../../../population.db";
 
 function connectToDatabase() {
-    fs.unlinkSync(filepath);
+    // fs.unlinkSync(filepath);
     if (fs.existsSync(filepath)) {
         return new sqlite3.Database(filepath);
     } else {

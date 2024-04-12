@@ -5,6 +5,7 @@ export class LoadMoviesController {
 
     async handle (request: LoadMoviesController.Request): Promise<any> {
         try {
+            console.log('== movies req ==', request)
             const movies = await this.loadMovies.exec(request);
 
             return ok(movies)

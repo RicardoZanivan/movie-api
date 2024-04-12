@@ -13,8 +13,8 @@ export class MoviesSqliteRepository {
       const params = [];
 
       if (input.year !== undefined) {
-          sql += ` WHERE year = ?`;
-          params.push(input.year);
+          sql += ` WHERE year LIKE ?`;
+          params.push(`%${input.year}%`);
       }
 
       if (input.winner !== undefined) {
@@ -63,7 +63,8 @@ export class MoviesSqliteRepository {
           WHERE winner = 'yes' AND studios LIKE '%' || studio_name || '%'
         )
         GROUP BY studio_name
-        ORDER BY winCount DESC;
+        ORDER BY winCount DESC
+        LIMIT 3;
       `;
 
       db.all(sql, [], (err, rows) => {
@@ -149,6 +150,7 @@ export class MoviesSqliteRepository {
         FROM migration
         WHERE winner = 'yes'
         GROUP BY year
+        HAVING COUNT(*) > 1
         ORDER BY winnerCount DESC
       `;
       db.all(sql, [], (err, rows) => {
