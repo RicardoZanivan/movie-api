@@ -6,7 +6,7 @@ interface YearWinnerCount {
   }
 
 export class MoviesSqliteRepository {
-  async loadAll(input?: {year?: number, winner?: 'yes' | 'no'}): Promise<any> {
+  async loadAll(input?: {year?: number, winner?: boolean, page?: number}): Promise<any> {
     return new Promise((resolve, reject) => {
       let sql = `SELECT ID, * FROM migration`;
       
@@ -28,6 +28,13 @@ export class MoviesSqliteRepository {
 
       sql += ` ORDER BY year ASC`;
 
+      const pageSize = 99;
+      const pageNumber = input.page || 1;
+      const offset = (pageNumber - 1) * pageSize;
+
+      sql += ` LIMIT ? OFFSET ?`;
+      params.push(pageSize, offset);
+
       db.all(sql, params, (err, rows) => {
         if (err) {
             reject(err);
@@ -47,7 +54,7 @@ export class MoviesSqliteRepository {
             SUBSTR(studios, INSTR(studios || ',', ',') + 1) AS studios_remaining
           FROM migration
           WHERE studios <> ''
-          and winner = 'yes'
+          and winner = true
           UNION ALL
           SELECT
             TRIM(SUBSTR(studios_remaining, 1, INSTR(studios_remaining || ',', ',') - 1)) AS studio_name,
@@ -60,7 +67,7 @@ export class MoviesSqliteRepository {
         WHERE EXISTS (
           SELECT 1
           FROM migration
-          WHERE winner = 'yes' AND studios LIKE '%' || studio_name || '%'
+          WHERE winner = true AND studios LIKE '%' || studio_name || '%'
         )
         GROUP BY studio_name
         ORDER BY winCount DESC
@@ -81,7 +88,7 @@ export class MoviesSqliteRepository {
     return new Promise((resolve, reject) => {
       const producersMap = new Map<string, number[]>();
   
-      const sql = `SELECT producers, year FROM migration WHERE winner = 'yes'`;
+      const sql = `SELECT producers, year FROM migration WHERE winner = true`;
       db.all(sql, [], (error, rows) => {
         if (error) {
           reject(error);
@@ -148,7 +155,7 @@ export class MoviesSqliteRepository {
       const sql = `
         SELECT year, COUNT(*) as winnerCount
         FROM migration
-        WHERE winner = 'yes'
+        WHERE winner = true
         GROUP BY year
         HAVING COUNT(*) > 1
         ORDER BY winnerCount DESC

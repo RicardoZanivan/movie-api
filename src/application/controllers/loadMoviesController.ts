@@ -5,8 +5,14 @@ export class LoadMoviesController {
 
     async handle (request: LoadMoviesController.Request): Promise<any> {
         try {
-            console.log('== movies req ==', request)
-            const movies = await this.loadMovies.exec(request);
+            let winner: boolean;
+            if (request && request.winner !== undefined && request.winner !== null && request.winner !== '') {
+                winner = (request.winner == 'true') ? true : false
+            }
+            const movies = await this.loadMovies.exec({
+                ...request,
+                winner
+            });
 
             return ok(movies)
         } catch (error) {
@@ -19,7 +25,7 @@ export namespace LoadMoviesController {
     export type Request = {
         page?: number
         size?: number
-        winner?: boolean
+        winner?: string
         year?: number
     }
 }

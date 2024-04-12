@@ -27,7 +27,7 @@ function createTable(db) {
             title       VARCHAR(255),
             studios     VARCHAR(255),
             producers   VARCHAR(255),
-            winner      VARCHAR(10)
+            winner      BOOLEAN
         )
     `);
 }

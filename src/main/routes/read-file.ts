@@ -15,37 +15,6 @@ export default (router: Router): void => {
         abortController.abort()
     })
 
-    // Readable.toWeb(createReadStream('./public/movielist.csv'))
-    //     .pipeThrough(Transform.toWeb(csvtojson()))
-    //     .pipeThrough(new TransformStream({
-    //     transform(chunk, controller) {
-    //         const data = JSON.parse(Buffer.from(chunk) as any)
-    //         console.log('=== data ===', data)
-    //         const mappedData = {
-    //         title: data.title,
-    //         description: data.description,
-    //         url_anime: data.url_anime
-    //         }
-    //         console.log('=== mappedData ===', mappedData)
-    //         // quebra de linha pois é um NDJSON
-    //         controller.enqueue(JSON.stringify(mappedData).concat('\n'))
-    //     }
-    //     }))
-    //   // pipeTo é a ultima etapa
-    //     .pipeTo(new WritableStream({
-    //         async write(chunk) {
-    //         await setTimeout(200)
-    //         items++
-    //         res.write(chunk)
-    //         },
-    //         close() {
-    //         res.end()
-    //         }
-
-        // }), {
-        //     signal: abortController.signal
-        // })
-
-      res.writeHead(200)
+    res.writeHead(200)
   })
 }

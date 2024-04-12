@@ -20,10 +20,11 @@ export async function insertData() {
   fs.createReadStream("public/movielist.csv")
     .pipe(parse({ delimiter: ";", from_line: 2 }))
     .on("data", function (row) {
+      const winner: boolean = (row && row[4] && row[4] == 'yes') ? true : false;
       db.serialize(function () {
         db.run(
           `INSERT INTO migration VALUES (?, ?, ? , ?, ?, ?)`,
-          [this.lastID, row[0], row[1], row[2], row[3], row[4]],
+          [this.lastID, row[0], row[1], row[2], row[3], winner],
           function (error) {
             if (error) {
               return console.log(error.message);
