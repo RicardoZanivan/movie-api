@@ -1,8 +1,8 @@
-import { LoadProductorsAwardsInterval } from '@/domain/use-cases'
-import { LoadAwardsInterval } from '@/domain/contracts/repos'
-import { MoviesSqliteRepository } from '@/infra/repos/sqlite3/movies'
+import { MinMaxIntervalAwards, setupMinMaxIntervalAwards } from '@/domain/use-cases'
+import { makeMoviesSqliteRepository } from '@/main/factories/infra/repos/sqlite3'
 
-export const makeLoadAwardsInterval = (): LoadAwardsInterval => {
-  const moviesSqliteRepository = new MoviesSqliteRepository()
-  return new LoadProductorsAwardsInterval(moviesSqliteRepository)
+export const makeMinMaxIntervalAwards = (): MinMaxIntervalAwards => {
+  return setupMinMaxIntervalAwards(
+    makeMoviesSqliteRepository()
+  )
 }

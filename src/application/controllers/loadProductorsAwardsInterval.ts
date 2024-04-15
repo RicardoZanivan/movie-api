@@ -1,15 +1,15 @@
-import { LoadAwardsInterval } from "@/domain/contracts/repos";
+import { MinMaxIntervalAwards } from "@/domain/use-cases";
 import { HttpResponse, ok, serverError } from "../helpers";
 import { Controller } from "./controller";
 
 export class LoadProductorsAwardsIntervalController implements Controller {
-    constructor (private readonly loadAwardsInterval: LoadAwardsInterval) {}
+    constructor (private readonly minMaxIntervalAwards: MinMaxIntervalAwards) {}
 
     async handle (): Promise<HttpResponse> {
         try {
-            const movies = await this.loadAwardsInterval.exec();
+            const intervals = await this.minMaxIntervalAwards();
 
-            return ok(movies)
+            return ok(intervals)
         } catch (error) {
             return serverError(error)
         }

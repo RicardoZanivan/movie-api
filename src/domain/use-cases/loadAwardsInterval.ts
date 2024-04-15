@@ -1,9 +1,30 @@
 import { MoviesSqliteRepository } from "@/infra/repos/sqlite3/movies";
 
-export class LoadProductorsAwardsInterval {
-    constructor (private readonly moviesSqliteRepository: MoviesSqliteRepository) {}
+type Setup = (
+    moviesSqliteRepository: MoviesSqliteRepository
+) => MinMaxIntervalAwards;
 
-    async exec (): Promise<any> {
-        return this.moviesSqliteRepository.loadMinMaxInterval();
-    }
+type Output = {
+    min: [
+        {
+            producer: string,
+            interval: number,
+            previousWin: number,
+            followingWin: number
+        }[]
+      ],
+      max: [
+        {
+            producer: string,
+            interval: number,
+            previousWin: number,
+            followingWin: number
+        }[]
+      ]
+};
+
+export type MinMaxIntervalAwards = () => Promise<Output>
+
+export const setupMinMaxIntervalAwards: Setup = (moviesSqliteRepository) => async () => {
+    return await moviesSqliteRepository.loadMinMaxInterval();
 }
