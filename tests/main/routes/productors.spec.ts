@@ -13,7 +13,7 @@ const deleteAllMovies = async (): Promise<void> => {
     });
 }
 
-describe('Movies Routes', () => {
+describe('Productors Routes', () => {
     beforeAll(async () => {
         db = connectToDatabase
     })
@@ -26,26 +26,10 @@ describe('Movies Routes', () => {
         await deleteAllMovies();
     })
 
-    describe('GET /movies', () => {
-        test('Should return 200 on load studios on success', async () => {
+    describe('GET /productors/awardsInterval', () => {
+        test('Should return 200 on load productors awards interval on success', async () => {
             await request(app)
-                .get('/api/movies')
-                .expect(200)
-        })
-    })
-
-    describe('GET /movies/topyears', () => {
-        test('Should return 200 on load top years on success', async () => {
-            await request(app)
-                .get('/api/movies/topyears')
-                .expect(200)
-        })
-    })
-
-    describe('GET /movies/topstudios', () => {
-        test('Should return 200 on load studios on success', async () => {
-            await request(app)
-                .get('/api/movies/topstudios')
+                .get('/api/productors/awardsInterval')
                 .expect(200)
         })
     })

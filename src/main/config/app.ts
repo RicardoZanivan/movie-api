@@ -37,7 +37,7 @@ export async function insertData() {
 insertData();
 
 app.get('/', (req, res) => {
-  res.send('Hello world!');
+  res.send('=== Movies awards ===!');
 });
 
 export { app }
