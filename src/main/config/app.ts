@@ -34,7 +34,7 @@ export async function insertData() {
       });
     });
 }
-insertData();
+// insertData();
 
 app.get('/', (req, res) => {
   res.send('=== Movies awards ===!');

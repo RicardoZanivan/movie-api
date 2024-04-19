@@ -1,4 +1,5 @@
-const db = require("./db");
+import { SQLiteConnection } from './helpers';
+import sqlite3 from 'sqlite3';
 
 interface YearWinnerCount {
     year: number;
@@ -6,9 +7,18 @@ interface YearWinnerCount {
   }
 
 export class MoviesSqliteRepository {
+  private db: sqlite3.Database | null = null;
+
+  constructor() {
+    this.db = SQLiteConnection.getInstance().getDb();
+    if (!this.db) {
+      throw new Error('Failed to get database instance');
+    }
+  }
+
   async loadAll(input?: {year?: number, winner?: boolean, page?: number}): Promise<any> {
     return new Promise((resolve, reject) => {
-      let sql = `SELECT ID, * FROM migration`;
+      let sql = `SELECT ID, * FROM movies`;
       
       const params = [];
 
@@ -35,7 +45,7 @@ export class MoviesSqliteRepository {
       sql += ` LIMIT ? OFFSET ?`;
       params.push(pageSize, offset);
 
-      db.all(sql, params, (err, rows) => {
+      this.db.all(sql, params, (err, rows) => {
         if (err) {
             reject(err);
         } else {
@@ -52,7 +62,7 @@ export class MoviesSqliteRepository {
           SELECT 
             TRIM(SUBSTR(studios, 1, INSTR(studios || ',', ',') - 1)) AS studio_name,
             SUBSTR(studios, INSTR(studios || ',', ',') + 1) AS studios_remaining
-          FROM migration
+          FROM movies
           WHERE studios <> ''
           and winner = true
           UNION ALL
@@ -66,7 +76,7 @@ export class MoviesSqliteRepository {
         FROM Split
         WHERE EXISTS (
           SELECT 1
-          FROM migration
+          FROM movies
           WHERE winner = true AND studios LIKE '%' || studio_name || '%'
         )
         GROUP BY studio_name
@@ -74,7 +84,7 @@ export class MoviesSqliteRepository {
         LIMIT 3;
       `;
 
-      db.all(sql, [], (err, rows) => {
+      this.db.all(sql, [], (err, rows) => {
         if (err) {
             reject(err);
         } else {
@@ -86,18 +96,19 @@ export class MoviesSqliteRepository {
 
   async loadMinMaxInterval(): Promise<any> {
     return new Promise((resolve, reject) => {
+
       const producersMap = new Map<string, number[]>();
   
-      const sql = `SELECT producers, year FROM migration WHERE winner = true`;
-      db.all(sql, [], (error, rows) => {
+      const sql = `SELECT producers, year FROM movies WHERE winner = true`;
+      this.db.all(sql, [], (error, rows) => {
         if (error) {
           reject(error);
           return;
         }
   
         // Iterar sobre os resultados da consulta
-        rows.forEach(row => {
-          const producers = row.producers.split(',').map(p => p.trim());
+        rows.forEach((row: any) => {
+          const producers = row.producers.split(/,\s| and /).map(p => p.trim());
           const year = parseInt(row.year);
   
           // Calcular o intervalo entre prêmios para cada produtor
@@ -154,17 +165,17 @@ export class MoviesSqliteRepository {
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT year, COUNT(*) as winnerCount
-        FROM migration
+        FROM movies
         WHERE winner = true
         GROUP BY year
         HAVING COUNT(*) > 1
         ORDER BY winnerCount DESC
       `;
-      db.all(sql, [], (err, rows) => {
+      this.db.all(sql, [], (err, rows) => {
         if (err) {
           reject(err);
         } else {
-          const formattedRows: YearWinnerCount[] = rows.map(row => ({
+          const formattedRows: YearWinnerCount[] = rows.map((row: any) => ({
             year: row.year,
             winnerCount: row.winnerCount
           }));
