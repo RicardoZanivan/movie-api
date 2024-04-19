@@ -29,4 +29,25 @@ export class SQLiteConnection {
   public getDb(): sqlite3.Database | null {
     return this.db;
   }
+
+  public setDb(db: sqlite3.Database): void {
+    this.db = db;
+  }
+
+  public async close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.db) {
+        this.db.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            console.log('== [DB] Connection closed ==');
+            resolve();
+          }
+        });
+      } else {
+        reject(new Error('Database connection is not established'));
+      }
+    });
+  }
 }

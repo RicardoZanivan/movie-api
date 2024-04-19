@@ -1,36 +1,50 @@
 import request from 'supertest';
 import { app } from '@/main/config/app';
-const connectToDatabase = require("../../../src/infra/repos/sqlite3/db")
+import sqlite3 from 'sqlite3';
+import { populateDatabaseFromCSV } from '@/infra/services';
+import { SQLiteConnection } from '@/infra/repos/sqlite3/helpers';
 
-let db;
-
-const deleteAllMovies = async (): Promise<void> => {
-    db.run('DELETE FROM migration', function(error) {
-        if (error) {
-          return console.error('Erro ao limpar a tabela:', error.message);
-        }
-        console.log('Tabela limpa com sucesso passou.');
-    });
-}
+async function setupDatabase(): Promise<void> {
+    const db = new sqlite3.Database(':memory:');
+    if (!db) {
+      throw new Error('Failed to create database instance');
+    }
+    SQLiteConnection.getInstance().setDb(db);
+    await populateDatabaseFromCSV('public/movielist.csv', db);
+  }
 
 describe('Productors Routes', () => {
     beforeAll(async () => {
-        db = connectToDatabase
+        await setupDatabase();
     })
     
     afterAll(async () => {
-        db.close();
-    })
-
-    beforeEach(async () => {
-        await deleteAllMovies();
+        await SQLiteConnection.getInstance().close();
     })
 
     describe('GET /productors/awardsInterval', () => {
         test('Should return 200 on load productors awards interval on success', async () => {
-            await request(app)
+            const response = await request(app)
                 .get('/api/productors/awardsInterval')
                 .expect(200)
+
+            const { body } = response;
+            expect(body).toHaveProperty('min');
+            expect(body).toHaveProperty('max');
+            expect(body.min.length).toBeGreaterThan(0);
+            expect(body.max.length).toBeGreaterThan(0);
+            body.min.forEach(interval => {
+                expect(interval).toHaveProperty('producer');
+                expect(interval).toHaveProperty('interval');
+                expect(interval).toHaveProperty('previousWin');
+                expect(interval).toHaveProperty('followingWin');
+            });
+            body.max.forEach(interval => {
+                expect(interval).toHaveProperty('producer');
+                expect(interval).toHaveProperty('interval');
+                expect(interval).toHaveProperty('previousWin');
+                expect(interval).toHaveProperty('followingWin');
+            });
         })
     })
 })

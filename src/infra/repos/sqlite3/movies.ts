@@ -1,5 +1,4 @@
 import { SQLiteConnection } from './helpers';
-import sqlite3 from 'sqlite3';
 
 interface YearWinnerCount {
     year: number;
@@ -7,16 +6,9 @@ interface YearWinnerCount {
   }
 
 export class MoviesSqliteRepository {
-  private db: sqlite3.Database | null = null;
-
-  constructor() {
-    this.db = SQLiteConnection.getInstance().getDb();
-    if (!this.db) {
-      throw new Error('Failed to get database instance');
-    }
-  }
-
   async loadAll(input?: {year?: number, winner?: boolean, page?: number}): Promise<any> {
+    const db = SQLiteConnection.getInstance().getDb();
+
     return new Promise((resolve, reject) => {
       let sql = `SELECT ID, * FROM movies`;
       
@@ -45,7 +37,7 @@ export class MoviesSqliteRepository {
       sql += ` LIMIT ? OFFSET ?`;
       params.push(pageSize, offset);
 
-      this.db.all(sql, params, (err, rows) => {
+      db.all(sql, params, (err, rows) => {
         if (err) {
             reject(err);
         } else {
@@ -56,6 +48,8 @@ export class MoviesSqliteRepository {
   }
 
   async loadTopStudios(): Promise<any> {
+    const db = SQLiteConnection.getInstance().getDb();
+
     return new Promise((resolve, reject) => {
       const sql = `
         WITH RECURSIVE Split(studio_name, studios_remaining) AS (
@@ -84,7 +78,7 @@ export class MoviesSqliteRepository {
         LIMIT 3;
       `;
 
-      this.db.all(sql, [], (err, rows) => {
+      db.all(sql, [], (err, rows) => {
         if (err) {
             reject(err);
         } else {
@@ -95,12 +89,14 @@ export class MoviesSqliteRepository {
   }
 
   async loadMinMaxInterval(): Promise<any> {
+    const db = SQLiteConnection.getInstance().getDb();
+
     return new Promise((resolve, reject) => {
 
       const producersMap = new Map<string, number[]>();
   
       const sql = `SELECT producers, year FROM movies WHERE winner = true`;
-      this.db.all(sql, [], (error, rows) => {
+      db.all(sql, [], (error, rows) => {
         if (error) {
           reject(error);
           return;
@@ -108,7 +104,8 @@ export class MoviesSqliteRepository {
   
         // Iterar sobre os resultados da consulta
         rows.forEach((row: any) => {
-          const producers = row.producers.split(/,\s| and /).map(p => p.trim());
+          const producers = row.producers.replace(/,\s+and\s+/g, ' and ').split(/,\s| and /).map(p => p.trim());
+          // const producers = row.producers.split(/,\s| and /).map(p => p.trim());
           const year = parseInt(row.year);
   
           // Calcular o intervalo entre prêmios para cada produtor
@@ -162,6 +159,8 @@ export class MoviesSqliteRepository {
   }
 
   async loadTopYearsAwards(): Promise<any> {
+    const db = SQLiteConnection.getInstance().getDb();
+
     return new Promise((resolve, reject) => {
       const sql = `
         SELECT year, COUNT(*) as winnerCount
@@ -171,7 +170,7 @@ export class MoviesSqliteRepository {
         HAVING COUNT(*) > 1
         ORDER BY winnerCount DESC
       `;
-      this.db.all(sql, [], (err, rows) => {
+      db.all(sql, [], (err, rows) => {
         if (err) {
           reject(err);
         } else {
